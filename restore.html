@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Load backup</h1>
+    <p>If you have a JSON backup and want to use it, paste it here and click Load.</p>
+    <p>Please note that this will remove your existing settings and stuff, so make sure you know what you're doing.</p>
+    <input type="text" id="pastehere" required>
+    <small id="status">Paste backup here to quickly restore from it and get back to your beaches.</small>
+  </main>
+  <footer>
+    <div class="row">
+      <button class="push" onclick="location.href = 'data.html'">Cancel</button>
+      <button class="primary" id="restorebtn" disabled>Load</button>
+    </div>
+  </footer>
+
+  <script>
+    const field = document.getElementById("pastehere");
+    const rbtn = document.getElementById("restorebtn");
+    const statussm = document.getElementById("status");
+
+    field.addEventListener("input", (e) => {
+      statussm.classList.remove("text-error");
+      if (field.value === "") {
+        rbtn.disabled = true;
+        statussm.textContent = "Paste backup here to quickly restore from it and get back to your beaches.";
+      } else {
+
+        try {
+          const backuptime = JSON.parse(field.value)._timestamp || "0000-01-01T00:00:00Z";
+          rbtn.disabled = false;
+          statussm.textContent = `Backup from ${dayjs(backuptime).format("D MMM YYYY [at] H:mm")}`;
+        } catch (e) {
+          rbtn.disabled = true;
+          statussm.textContent = "Backup isn't valid JSON, so I can't load it.";
+          statussm.classList.add("text-error");
+        }
+      }
+    })
+
+    rbtn.onclick = () => {
+      let backup;
+      try {
+        backup = JSON.parse(field.value);
+      } catch (e) {
+        backup = "Nah";
+        statussm.textContent = "Backup isn't valid JSON, so I can't load it.";
+        statussm.classList.add("text-error");
+        return;
+      }
+
+      statussm.textContent = "Restoring backup...";
+      rbtn.disabled = true;
+      field.disabled = true;
+      try {
+        for (const [key, value] of Object.entries(obj)) {
+          if (key.startsWith("tb:")) {
+            localStorage.setItem(key, value);
+          }
+        }
+      } catch (e) {
+        statussm.textContent = "I couldn't load your backup. Error " + e.message;
+        statussm.classList.add("text-error");
+      }
+
+      statussm.textContent = "Restored backup :)";
+      statussm.classList.add("text-success")
+
+      setTimeout(() => { location.href = "index.html" }, 2000);
+    }
+  </script>
+</body>
+</html>

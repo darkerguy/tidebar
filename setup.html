@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <meta name="description" content="Tidebar is a cool website/app that shows beach weather for today and tomorrow, and also sunsets, sunrises and wave heights.">
+</head>
+<body>
+  <main>
+    <div class="centered">
+      <img src="logo.png" alt="logo">
+      <h1>Welcome to Tidebar</h1>
+      <p>A chill beach app with tides, forecasts, surfing, personalized recommendations, and many other cool features. There is no tracking, accounts or any of that nonsense. You can even customize it!</p>
+      <button class="primary" onclick="location.href = 'setup1.html'">Get started</button>
+    </div>
+  </main>
+  <footer>
+    <div class="row no-gap">
+      <button class="icon" onclick="location.href = 'document.html?backto=setup.html&doc=about'" aria-label="More details"><i class="ph ph-info"></i></button>
+      <button class="icon" onclick="location.href = 'setuprestore.html'" aria-label="Load backup"><i class="ph ph-box-arrow-up"></i></button>
+      <button class="icon" onclick="location.href = 'document.html?backto=setup.html&doc=tos'" aria-label="ToS / privacy"><i class="ph ph-scroll"></i></button>
+      <button class="icon" onclick="location.href = 'document.html?backto=setup.html&doc=history'" aria-label="App history"><i class="ph ph-clock"></i></button>
+      <button class="icon" onclick="location.href = 'https://github.com/darkerguy/tidebar'" aria-label="GitHub"><i class="ph ph-github-logo"></i></button>
+      <button class="push" onclick="document.getElementById('skip-setup').showModal()">Skip <i class="ph ph-skip-forward"></i></button>
+    </div>
+  </footer>
+  <dialog id="skip-setup">
+    <div class="wrapper">
+      <div class="header">
+        <h2>Skip setup</h2>
+        <p>Are you sure you wanna skip setup? The app will still work fine.</p>
+      </div>
+      <div class="content">
+        <label class="checkcard"><input type="checkbox" name="dbdownload" id="dbdownload" checked>
+          <span><strong>Save beach info locally now (recommended for mobile)</strong><br>On mobile, you can turn this on to save your data plan. What this does is that beach data like location, country and other info about beaches gets saved locally instead of being pulled from the internet.</span></label>
+      </div>
+      <div class="footer">
+        <div class="row">
+          <button class="push" onclick="document.getElementById('skip-setup').close()">Cancel</button>
+          <button id="skipconfirm">Skip</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module">
+    async function skip() {
+      const downloadDB = document.getElementById("dbdownload").checked;
+      if (downloadDB) {
+        await Shorebase.load();
+        console.log(Shorebase.db);
+        localStorage.setItem("shorebase", JSON.stringify(Shorebase.db));
+        localStorage.setItem("shorebaseAuthor", "Tidebar");
+      }
+    }
+
+    document.getElementById("skipconfirm").addEventListener("click", async () => {
+      document.getElementById("skip-setup").close();
+      localStorage.setItem("tb:setupDone", "true");
+      await skip();
+      location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

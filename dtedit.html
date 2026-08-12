@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date and time settings • Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="settings.html">Settings</a> / <strong>Date and time</strong></span>
+    <h1>Date and time options</h1>
+    <p>Edit how date and time should look.</p>
+
+    <label>
+      Date format
+      <select id="dateformat" onchange="localStorage.setItem('tb:dateFormat', this.value)">
+        <option value="D MMM YYYY">14 Jul 2026</option>
+        <option value="MMM D YYYY">Jul 14 2026</option>
+        <option value="D/M/YYYY">14/7/2026</option>
+        <option value="D.M.YYYY">14.7.2026</option>
+        <option value="MM/DD/YYYY">07/14/2026</option>
+        <option value="YYYY-MM-DD">2026-07-14</option>
+        <option value="YYYY/M/D">2026/7/14</option>
+      </select>
+    </label>
+    <label>
+      Time format
+      <select id="timeformat" onchange="localStorage.setItem('tb:timeFormat', this.value)">
+        <option value="H:mm">24 hour (7:00, 14:30)</option>
+        <option value="hh:mm A">12 hour (07:00 AM, 02:30 PM)</option>
+      </select>
+    </label>
+  </main>
+  <footer class="related">
+    <span><strong>Related settings</strong></span>
+    <button class="link" onclick="location.href = 'advanceddt.html'">Advanced datetime</button>
+    <button class="link" onclick="location.href = 'prefweather.html'">Change preferred weather</button>
+  </footer>
+
+  <script>
+    document.getElementById("dateformat").value = window.settings.dateFormat;
+    document.getElementById("timeformat").value = window.settings.timeFormat;
+  </script>
+</body>
+</html>

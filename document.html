@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <div class="documentview" id="about">
+      <div class="centered">
+        <img src="logo.png" alt="Tidebar logo" width="40" height="40">
+        <h2 class="rmspace bottom">About Tidebar</h2>
+        <small><em>Some info about Tidebar so you know what it is</em></small>
+      </div>
+      <p>Tidebar is a free, privacy-friendly beach app. It has weather, tides, sun, customizable themes, a map of beaches, 350+ beaches and more cool stuff.</p>
+      <p>It never requires accounts, sends analytics, or stores cookies. Everything is in localStorage (just a way to store data locally) and isn't sent to any server. You can read the <a onclick="setdw('tos')">ToS</a> for more details on privacy.</p>
+      <p>Wallpapers are stock photos (<a onclick="setdw('credits')">credits</a>), but the logo is made by me.</p>
+      <p>This isn't my first beach weather app, and probably also not my last - check out the <a onclick="setdw('history')">history page</a>!</p>
+    </div>
+    <div class="documentview" id="tos">
+      <h2 class="rmspace bottom">Tidebar terms of service</h2>
+      <p>These are just rules you have to follow. By using Tidebar, you agree to these rules:</p>
+      <ul>
+        <li><strong>🌴 Copyright</strong> - Tidebar is completely open-source on GitHub in the <a href="https://github.com/darkerguy/tidebar">darkerguy/tidebar</a> repo. You can check the code that runs, and it uses the MIT license. That just means you can do almost anything you want with it, but you must keep the original license with the copyright with you. <a onclick="setdw('credits')">Image credits</a></li>
+        <li><strong>🌊 Safety, responsibility and liability</strong> - the app is provided as-is, with no warranty. If the app breaks, I'm not responsible for that, and I don't take responsibility for any data provided by Tidebar. So if it says it will be clear and sunny but then a storm appears, I'm not liable.</li>
+        <li><strong>⛈️ Your data and privacy</strong> - I (nor the app) don't collect personal data or analytics. Any data you enter stays on your device. The only network calls are the weather/sun/tides/air/whatever API calls, beaches database, and some libraries for the code. No analytics or telemetry.</li>
+        <li><strong>🍹 Feedback</strong> -you can give feedback to tell me about Tidebar, either in GitHub Issues or thru the app UI. The in-app version uses BForms and I don't knowingly collect personal data. Don't submit your personal info. You must also be 13+ to give feedback. Feedbacks are welcome!</li>
+      </ul>
+    </div>
+    <div class="documentview" id="history">
+      <h2>History</h2>
+      <p>I've already made a beach app before. In fact, I have made two. Here's the full timeline of how it happened.</p>
+      <ol>
+        <li><strong>SeaChill (summer 2025)</strong> - I made this when I was learning HTML and it's... yeah, bad. Big parts of the code are made by AI, some features don't work, and it's overall not so good. You can find it here: <a href="https://darkerguy.github.io/seachill">Link</a></li>
+        <li><strong>CoolTide (early 2026)</strong> - I tried remaking SeaChill into something cooler and better, but while making it, I realized the app is built poorly and would now be hard to fix.</li>
+        <li><strong>Tidebar  (spring-summer 2026)</strong> - So I made this, a hopefully better remake of both SeaChill and CoolTide. <a onclick="setdw('about')">More details</a></li>
+      </ol>
+    </div>
+    <div class="documentview" id="credits">
+      <h2>Credits</h2>
+      <p>Tidebar is made by me (Darkerguy), and I own the copyright - it's my app. However, I didn't do everything. I used <a href="https://darkerguy.github.io/shorebase">Shorebase</a> (my API!) for beaches, <a href="https://open-meteo.com">OpenMeteo</a> for weather and <a href="https://leafletjs.com/">Leaflet.js</a> + <a href="https://www.openstreetmap.org">OSM</a> for the maps.</p>
+      <button class="primary" onclick="location.href = 'imageCredits.txt'">Read image credits</button>
+    </div>
+  </main>
+  <footer>
+    <button onclick="location.href = window.params.get('backto') || 'index.html'">Okay</button>
+  </footer>
+
+  <script>
+    window.params = new URLSearchParams(window.location.search);
+
+    const documents = document.querySelectorAll(".documentview");
+    documents.forEach(dw => {
+      if (dw.id === (window.params.get("doc") || "about")) {
+        dw.style.display = "block";
+      } else {
+        dw.style.display = "none";
+      }
+    });
+
+    function setdw(dwname) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("doc", dwname);
+      window.location.href = url.toString();
+    }
+  </script>
+</body>
+</html>

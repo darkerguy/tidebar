@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <div class="centered">
+      <h1>🌴</h1>
+      <h1>Nice</h1>
+      <p>Tidebar is now set up for you.</p>
+      <div id="next-steps" style="text-align: initial;">
+        <br><br>
+        <h2>Next steps</h2>
+        <div class="settingsbox card">
+          <div class="setting" id="location">
+            <label for="setLocation">
+              <strong>Enable location</strong><br>
+              Click to allow the app to use your location, I, the dev, don't see it, and it's not used for analytics, only for recommending nearby beaches.
+            </label>
+            <button id="setLocation" onclick="setLocationP()">Enable</button>
+          </div>
+          <div class="setting" id="localdb">
+            <label for="downloadlocaldb">
+              <strong>Download beach info locally</strong><br>
+              Select this to download a local copy of beach details (not weather but stuff like sand/pebble/rock or whether it has bars) - it's around 500 KB, and it's recommended for phone users to download it.
+            </label>
+            <button id="downloadlocaldb" onclick="downloadLocalDB()">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <button class="push" onclick="location.href = 'setup4.html'">Back</button>
+    <button class="primary" onclick="localStorage.setItem('tb:setupDone', 'true'); location.href = 'index.html'">Done</button>
+  </footer>
+  <script>
+    function checkNextStepsRemaining() {
+        const allHidden = $(".settingsbox").children.length === 0 || Array.from($(".settingsbox").children).every(child => child.style.display === "none");
+
+        if (allHidden) {
+          $("#next-steps").style.display = "none";
+        }
+    }
+
+    function setLocationP() {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          console.log("Permission granted");
+          $("#location").remove();
+          checkNextStepsRemaining();
+        },
+        (err) => {
+          console.log("Permission denied", err);
+        }
+      );
+    }
+
+    const isPhone = navigator.userAgentData?.mobile || (window.matchMedia("(max-width: 767px)").matches && navigator.maxTouchPoints > 0);
+
+    if (!isPhone) {
+      $("#localdb").remove();
+    }
+
+    function downloadLocalDB() {
+      Shorebase.loadSync();
+      console.log(Shorebase.db);
+      localStorage.setItem("shorebase", JSON.stringify(Shorebase.db));
+      localStorage.setItem("shorebaseAuthor", "Tidebar");
+      $("#localdb").remove();
+    }
+
+    checkNextStepsRemaining();
+  </script>
+</body>
+</html>

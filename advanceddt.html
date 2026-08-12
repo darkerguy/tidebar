@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced date and time settings • Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-timezone-offset@1.0.0/dist/index.min.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="settings.html">Settings</a> / <a href="dtedit.html">Date and time</a> / <strong>Advanced datetime</strong></span>
+    <h1>Advanced date and time settings</h1>
+    <p>Customize how dates and times are displayed in the app.</p>
+
+    <label>
+      Date format
+      <input type="text" id="dateformat" list="datefmt" oninput="localStorage.setItem('tb:dateFormat', this.value)">
+    </label>
+    <datalist id="datefmt">
+        <option value="D MMM YYYY">14 Jul 2026</option>
+        <option value="MMM D YYYY">Jul 14 2026</option>
+        <option value="D/M/YYYY">14/7/2026</option>
+        <option value="D.M.YYYY">14.7.2026</option>
+        <option value="MM/DD/YYYY">07/14/2026</option>
+        <option value="YYYY-MM-DD">2026-07-14</option>
+        <option value="YYYY/M/D">2026/7/14</option>
+    </datalist>
+    <label>
+      Time format
+      <input type="text" id="timeformat" list="timefmt" oninput="localStorage.setItem('tb:timeFormat', this.value)">
+    </label>
+    <datalist id="timefmt">
+        <option value="H:mm">24 hour (7:00, 14:30)</option>
+        <option value="hh:mm A">12 hour (07:00 AM, 02:30 PM)</option>
+    </datalist>
+    <small>These two use <a href="https://day.js.org/docs/en/display/format" target="_blank">Day.js</a> tokens</small>
+<!--     <br><br>
+    <label>
+      Beach timezone
+      <select id="beachTimezone" oninput="localStorage.setItem('tb:beachTimezone', this.value)">
+        <option value="auto">Local time</option>
+        <option value="UTC">UTC</option>
+        <option value="browserTime">Your timezone</option>
+        <hr>
+      </select> -->
+    </label>
+  </main>
+  <footer class="related">
+    <span><strong>Related settings</strong></span>
+    <button class="link" onclick="location.href = 'dtedit.html'">Date & time</button>
+  </footer>
+  <script>
+    document.getElementById("dateformat").value = window.settings.dateFormat;
+    document.getElementById("timeformat").value = window.settings.timeFormat;
+    document.getElementById("beachTimezone").value = window.settings.beachTimezone;
+    const select = document.getElementById("beachTimezone");
+    const zones = Intl.supportedValuesOf("timeZone");
+
+    zones.forEach(tz => {
+      const opt = document.createElement("option");
+      opt.value = tz;
+      opt.textContent = tz;
+      select.appendChild(opt);
+    });
+  </script>
+</body>
+</html>

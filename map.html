@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beach map • Tidebar</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="index.html">Back</a></span>
+    <h1>Beaches</h1>
+    <p>Select what beach you want to show weather for. Use the map, or pick one of your favorites.</p>
+    <br>
+    <input type="search" name="searchField" id="searchField" placeholder="Search 300+ beaches..." oninput="updateMap(this.value)">
+    <br><br>
+    <div id="map"></div>
+    <h2 class="rdspace bottom">Favorites</h2>
+    <div id="favs"></div>
+    <h2 class="rdspace bottom">Recently viewed</h2>
+    <div id="recents"></div>
+  </main>
+  <footer>
+    <div class="row no-gap">
+      <button class="icon" aria-label="Map credits" onclick="alert('The map uses OpenStreetMap (OSM) and Leaflet, and the beaches are from Shorebase.')"><i class="ph ph-info"></i></button>
+      <button class="link" id="enableLocation" onclick="enableLocation()">Enable location</button>
+    </div>
+  </footer>
+
+  <script>
+    const country = decodeURIComponent(new URLSearchParams(location.search).get("country")) || null;
+
+    const map = L.map("map").setView([38, 21], 3);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "<a href='https://www.openstreetmap.org'>OpenStreetMap</a> (<a href='https://www.openstreetmap.org/copyright'>License</a>)"
+    }).addTo(map);
+
+    navigator.permissions.query({ name: "geolocation" }).then(result => {
+      if (result.state === "granted") {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const { latitude, longitude } = pos.coords;
+            if (!country) map.setView([latitude, longitude], 12);
+        });
+        $("#enableLocation").remove();
+      setupCountry();
+      }
+      setupCountry();
+    });
+
+    function setupCountry() {
+      if (country) {
+        fetch(`https://nominatim.openstreetmap.org/search?country=${country}&format=json`).then(r => r.json()).then(results => {
+            if (!results.length) return;
+            const bbox = results[0].boundingbox; // [south, north, west, east]
+            map.fitBounds([
+                [bbox[0], bbox[2]],
+                [bbox[1], bbox[3]]
+            ]);
+        });
+      }
+    }
+
+    sbsetup();
+    Shorebase.db = Shorebase.loadSync();
+
+    function clearMap() {
+      map.eachLayer(function (layer) {
+        if (!(layer instanceof L.GridLayer)) {
+          map.removeLayer(layer);
+        }
+      });
+    }
+
+    function updateFavDisplay() {
+      const favsBox = $("#favs");
+      if (window.favs.length === 0) {
+        favsBox.textContent = "No favorites yet.";
+        return;
+      } else {
+        favsBox.textContent = "";
+        favs.forEach(fav => {
+          const beach = Shorebase.db.find(b => b.name === fav);
+          console.log(Shorebase.db.find(b => b.name === fav));
+          const el = document.createElement("details");
+          console.log({ fav, beach, el });
+          el.classList.add("beach-item");
+          el.innerHTML = `<summary>
+            <span class="icon">${beach.icon}</span>
+            <span><strong>${beach.name}, ${beach.country}</strong><br>${sentenceCase(beach.type === "pebble" ? beach.type : beach.type + "y")} ${beach.hasBarsOrRestaurants ? "with" : "without"} food</span>
+            <button class="primary" onclick="location.href = 'beach.html?name=${encodeURIComponent(beach.name)}'">Show weather</button>
+          </summary>
+          <div class="det-body">
+            <p class="rmspace top">${beachInfoList(beach).join("<br>")}</p>
+            <br>
+            <a onclick="favs.toggleFav('${beach.name}'); updateMap('${$("#searchField").value}'); updateFavDisplay()">Remove from favorites</a><br>
+            <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(normStr(beach.name) + " " + beach.country)}">Google this beach</a>
+          </div>`;
+          if (favs[0] !== fav) {
+            const br = document.createElement("br");
+            favsBox.appendChild(br);
+          }
+          favsBox.appendChild(el);
+        }); 
+      }
+    }
+
+    function updateRecentsDisplay() {
+      const recentsBox = $("#recents");
+      if (recentBeaches.get().length === 0) {
+        recentsBox.textContent = "Nothing viewed recently.";
+        return;        
+      }
+      recentsBox.textContent = "";
+      recentBeaches.get().forEach(recent => {
+        const beach = Shorebase.db.find(b => b.name === recent);
+        const el = document.createElement("details");
+        el.classList.add("beach-item");
+        el.innerHTML = `<summary>
+          <span class="icon">${beach.icon}</span>
+          <span><strong>${beach.name}, ${beach.country}</strong><br>${sentenceCase(beach.type === "pebble" ? beach.type : beach.type + "y")} ${beach.hasBarsOrRestaurants ? "with" : "without"} food</span>
+          <button class="primary" onclick="location.href = 'beach.html?name=${encodeURIComponent(beach.name)}'">Show weather</button>
+        </summary>
+        <div class="det-body">
+          <p class="rmspace top">${beachInfoList(beach).join("<br>")}</p>
+          <br>
+          <a onclick="recentBeaches.remove('${beach.name}'); updateMap('${$("#searchField").value}'); updateRecentsDisplay()">Remove from history</a><br>
+          <a target="_blank" href="https://www.google.com/search?q=${encodeURIComponent(normStr(beach.name) + " " + beach.country)}">Google this beach</a>
+        </div>`;
+        if (recentBeaches.get()[0] !== recent) {
+          const br = document.createElement("br");
+          recentsBox.appendChild(br);
+        }
+        recentsBox.appendChild(el);
+      });
+    }
+
+    function updateMap(filter) {
+      clearMap()
+      Shorebase.db.forEach(beach => {
+        if (typeof filter !== "string") {
+          filter = "";
+        }
+        console.log(filter);
+        console.log(normStr(filter));
+        console.log(normStr(filter).toLowerCase());
+        console.log(beach.name);
+        console.log(normStr(beach.name));
+        console.log(normStr(beach.name).toLowerCase());
+        if (!normStr(beach.name).toLowerCase().includes(normStr(filter).toLowerCase()) && filter !== "") {
+          console.log("Skipping"); return;
+        }
+        const emojiIcon = L.divIcon({
+          html: beach.icon,
+          className: "map-icon-marker",
+          iconSize: [30, 30]
+        });
+        const marker = L.marker([beach.lat, beach.lng], { icon: emojiIcon }).addTo(map);
+
+        const has = beachInfoList(beach);
+        marker.bindPopup(`<strong>${beach.name} ${beach.icon}</strong><br>${beach.country} (${beach.lat},${beach.lng})<br>${sentenceCase(beach.type === "pebble" ? beach.type : beach.type + "y")}, ${beach.hasBarsOrRestaurants ? "has" : "doesn't have"} bars or restaurants<br>${has.join("<br>")}<br><br><a href="beach.html?name=${encodeURIComponent(beach.name)}">View details</a><br><a onclick="favs.toggleFav('${beach.name}'); updateMap('${$("#searchField").value}'); updateFavDisplay()">${favs.includes(beach.name) ? "Unfavorite" : "Favorite"}</a><br><a href="https://www.google.com/search?q=${encodeURIComponent(normStr(beach.name) + " " + beach.country)}">Google this beach</a>`);
+      });
+    }
+
+    updateMap("");
+    updateFavDisplay();
+    updateRecentsDisplay();
+    setTimeout(() => { updateMap(""); }, 120);
+  </script>
+</body>
+</html>

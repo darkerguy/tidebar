@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility • Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-timezone-offset@1.0.0/dist/index.min.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="settings.html">Settings</a> / <strong>Ease of access</strong></span>
+    <h1>Tweak accessability settings</h1>
+    <p>Manage ease of access options in Tidebar.</p>
+
+    <div class="settingsbox card">
+      <div class="setting">
+        <label for="nativeSelect">
+          <strong>Use native dropdowns</strong><br>
+          Use the browser's default dropdown menus instead of custom ones, as the custom one can break sometimes or be hard to use on mobile.
+        </label>
+        <input type="checkbox" id="nativeSelect" class="toggle" onchange="localStorage.setItem('tb:nativeSelect', this.checked)">
+      </div>
+    </div>
+  </main>
+  <footer class="related">
+    <span><strong>Related settings</strong></span>
+    <button class="link" onclick="location.href = 'geocfg.html'">Change preferred beach type</button>
+  </footer>
+  <script>
+    document.getElementById("nativeSelect").checked = window.settings.nativeSelect === "true";
+  </script>
+</body>
+</html>

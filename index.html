@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <script src="weatherapi.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
+</head>
+<body>
+  <main>
+    <small id="datetime">X XXX XXXX XX:XX</small>
+    <h1 class="rmspace top" id="welcome">Welcome to Tidebar</h1>
+    <button class="primary" onclick="location.href = 'map.html'">Explore beaches</button>
+    <br><br>
+    <div class="beachPageHero">
+      <div id="heroCard" class="card herocard">...</div>
+      <div class="card">
+        <strong id="aboutBeachHeader">Creating homepage...</strong>
+        <p id="aboutBeach" style="white-space: pre-wrap; line-height: 1.1em;">Please wait, getting data...</p>
+      </div>
+    </div>
+    <div id="extraBox"></div>
+  </main>
+  <footer>
+    <div class="row no-gap">
+      <button class="icon" aria-label="About" onclick="location.href = 'document.html?backto=index.html&doc=about'"><i class="ph ph-info"></i></button>
+      <button class="icon" aria-label="Settings" onclick="location.href = 'settings.html'"><i class="ph ph-gear-six"></i></button>
+      <button class="icon" aria-label="GitHub" onclick="location.href = 'https://github.com/darkerguy/tidebar'"><i class="ph ph-github-logo"></i></button>
+      <button class="link" id="enableLocation" onclick="enableLocation()">Enable location</button>
+    </div>
+  </footer>
+
+  <script>
+    dayjs.extend(dayjs_plugin_utc);
+    dayjs.extend(dayjs_plugin_timezone);
+
+    function updateDateTime() {
+      const now = dayjs();
+      const fmt = ["MMM D YYYY", "MMMM D YYYY", "MMM D, YYYY", "MMMM D, YYYY", "M/D/YYYY", "MM/DD/YYYY", "MM.DD.YYYY", "M-D-YYYY", "M.D.YYYY", "MM-DD-YYYY"].includes(window.settings.dateFormat) ? "dddd, MMMM D YYYY" : "dddd, D MMMM YYYY";
+      console.log(fmt, window.settings.dateFormat, window.settings.timeFormat, now.format(fmt + " " + window.settings.timeFormat));
+      document.getElementById("datetime").textContent = now.format(fmt + " " + window.settings.timeFormat);
+    }
+    const greetings = {
+      noname: {
+        morning: ["Good morning!", "Great morning dude!"],
+        day: ["How's the day going?", "Hope you're having a good day!"],
+        evening: ["Good evening!", "How was your day?"],
+        night: ["Good night!", "Have a good sleep!", "Going to the beach on midnight?!"],
+        generic: ["Hello", "Hi bro!", "Hey there!", "Yo dude!", "What's the weather like?"],
+      },
+      name: {
+        morning: ["Good morning {name}!", "New day, {name}!"],
+        day: ["How's the day going, {name}?", "Hope you're having a good day so far, {name}!"],
+        evening: ["Good evening {name}!", "How was your day, {name}?"],
+        night: ["Good night, {name}!"],
+        generic: ["Hello, {name}!", "Hi {name}!", "Hey {name}!", "Yo {name}!"],
+      }
+    };
+
+    function getTimeOfDay() {
+      const hour = dayjs().hour();
+      if (hour >= 5 && hour < 11) return "morning";
+      if (hour >= 11 && hour < 18) return "day";
+      if (hour >= 18 && hour < 21) return "evening";
+      return "night";
+    }
+
+    function pickGreeting() {
+      const hasName = window.settings && window.settings.username;
+      const useNamed = hasName && Math.random() > 0.6;
+      const category = useNamed ? "name" : "noname";
+      const timeOfDay = getTimeOfDay();
+      const useTimed = Math.random() < 0.5;
+      const pool = useTimed ? greetings[category][timeOfDay] : greetings[category].generic;
+      let greeting = pool[Math.floor(Math.random() * pool.length)];
+      if (useNamed) {
+        greeting = greeting.replace("{name}", window.settings.username);
+      }
+      return greeting;
+    }
+
+    function updateGreeting() {
+      document.getElementById("welcome").textContent = pickGreeting();
+    }
+
+    function setup(pos = []) {
+      const hcard = $("#heroCard");
+      const hourFormat = settings.timeFormat.replace(/[ms.:DMYZdz]/g, "").trim();
+      if (pos !== null && JSON.stringify(pos) !== "[]") {
+        const beachesScored = Shorebase.db.map(item => ({
+            ...item,
+            Distance: roundTo(L.latLng(pos).distanceTo(L.latLng(item.lat, item.lng)), 0)
+          }))
+          .filter(item => item.Distance <= 20000);
+        beachesScored.forEach((b, i) => {
+          let score = b.Distance;
+          if (favs.includes(b.name)) {
+            score -= 1000;
+          }
+          if (recentBeaches.get().includes(b.name)) {
+            score -= (5 - recentBeaches.get().indexOf(b.name)) * 100;
+          }
+          beachesScored[i].Score = score;
+        });
+        console.log(beachesScored);
+
+        if (beachesScored.length > 0) {
+          const beach = beachesScored.reduce((a, b) => a.Score < b.Score ? a : b);
+          console.log(beach);
+
+          let sunsetBeach = null;
+          if (beach.orientation !== "west") {
+            const beachesSunsetScored = Shorebase.db.map(item => ({
+              ...item,
+              Distance: roundTo(L.latLng(pos).distanceTo(L.latLng(item.lat, item.lng)), 0)
+            })).filter(b => b.orientation === "west");
+            beachesSunsetScored.forEach((b, i) => {
+              let score = b.Distance;
+              if (favs.includes(b.name)) {
+                score -= 1000;
+              }
+              if (recentBeaches.get().includes(b.name)) {
+                score -= (5 - recentBeaches.get().indexOf(b.name)) * 100;
+              }
+              beachesSunsetScored[i].Score = score;
+            });
+            sunsetBeach = beachesSunsetScored.reduce((a, b) => a.Score < b.Score ? a : b);
+          }
+
+          let sunriseBeach = null;
+          if (beach.orientation !== "east") {
+            const beachesSunriseScored = Shorebase.db.map(item => ({
+              ...item,
+              Distance: roundTo(L.latLng(pos).distanceTo(L.latLng(item.lat, item.lng)), 0)
+            })).filter(b => b.orientation === "east");
+            beachesSunriseScored.forEach((b, i) => {
+              let score = b.Distance;
+              if (favs.includes(b.name)) {
+                score -= 1000;
+              }
+              if (recentBeaches.get().includes(b.name)) {
+                score -= (5 - recentBeaches.get().indexOf(b.name)) * 100;
+              }
+              beachesSunriseScored[i].Score = score;
+            });
+            sunsetBeach = beachesSunriseScored.reduce((a, b) => a.Score < b.Score ? a : b);
+          }
+
+          const { weather, marine, warnings, scoreNow, scoresHourly, daily, context, timezone, ldate } = window.meteo.all(beach);
+          let now = dayjs().tz(timezone);
+          $("#aboutBeachHeader").textContent = `Showing weather for ${beach.name} ${beach.icon}`;
+          const thingies = [];
+          if (beach.showers) { thingies.push("showers"); }
+          if (beach.sunbeds) { thingies.push("sunbeds"); }
+          if (beach.umbrellas) { thingies.push("umbrellas"); }
+          $("#aboutBeach").innerHTML = `${beach.name} is a ${beach.type === "pebble" ? beach.type : beach.type + "y"} beach in ${beach.country}. There is ${beach.hasBarsOrRestaurants ? "" : "no "}food (like beach bars or restaurants). ${beach.toilets === "free" ? "There are free toilets." : (beach.toilets === "paid" ? "This place has toilets, but they're paid." : "There aren't any toilets.")}${thingies.length === 0 ? "" : " " + sentenceCase(naturalJoin(thingies)) + " are available here."}<br><br>${beachInfoList(beach).join("<br>")}<br><br><a href="https://www.google.com/search?q=${encodeURIComponent(normStr(beach.name) + " " + beach.country)}" target="_blank">Google this beach</a>`;
+
+          hcard.className = "card herocard";
+          hcard.classList.add(context.uiClass);
+          let timeofd = context.ctx.timeOfDay;
+          const conditions = `${meteo.codeToLabel(weather.current.weathercode)} • ${weather.current.temperature_2m}°C`;
+          let title = conditions;
+          let body = conditions;
+          if (timeofd === "lateNight") {
+            title = `It's the middle of the night`;
+            body = `It's currently ${now.format(settings.timeFormat)}, and the weather is ${meteo.codeToLabel(weather.current.weathercode, type="text").toLowerCase()} with ${weather.current.temperature_2m}°C temperature and ${marine.current.wave_height}m waves.`;
+          } else if (timeofd === "dawn") {
+            title = `Sunrise at ${context.sunrise.format(window.settings.timeFormat)}`;
+            body = context.sunsetViewable ? "The sunrise can be seen on this beach soon." : "While you won't see the sun from here, the glow will still probably be visible.";
+          } else if (timeofd === "earlyMorning") {
+            title = `Going to the beach this early?`;
+            body = scoreNow.score >= 7.5 ? `Good idea, the weather is good, temps around ${weather.current.temperature_2m}°C, and you avoid midday's sun. Today's max temperature is ${context.todayMaxTemp}°C, with UV peaking at ${context.uvMax}.` : `You can go, but the weather isn't the best. Today's max temp is ${context.todayMaxTemp}°C, and UV will go up to ${context.uvMax}.`;
+            if (context.bestTimes.length > 0) {
+              let humanRanges = [];
+              context.bestTimes.forEach(range => {
+                const rstart = ldate(range.from).format(settings.timeFormat);
+                const rend = ldate(range.to).format(settings.timeFormat);
+                humanRanges.push(`${rstart}-${rend}`);
+              });
+              body += scoreNow.score >= 7.5 ? "<br><br>Other good times to go today are " : "<br><br>Better times to go today are ";
+              body += naturalJoin(humanRanges);
+              body += ".";
+            }
+          } else if (timeofd === "morning") {
+            title = scoreNow.score >= 7.5 ? `Good time to go` : "Good morning";
+            body = scoreNow.score >= 7 ? `You should go now, as temps are ${weather.current.temperature_2m}°C, and you shouldn't be on the beach between 11:30 and 14:30.` : `You can go, but the weather isn't the best.`;
+            body += ` Forecast for today - ${context.todayMaxTemp} highest temp, waves up to ${context.maxWave}, UV peaking at ${context.uvMax}.`;
+            if (context.bestTimes.length > 0) {
+              let humanRanges = [];
+              context.bestTimes.forEach(range => {
+                const rstart = ldate(range.from).format(settings.timeFormat);
+                const rend = ldate(range.to).format(settings.timeFormat);
+                humanRanges.push(`${rstart}-${rend}`);
+              });
+              body += scoreNow.score >= 7 ? "<br><br>Other good times to go today are " : "<br><br>Better times to go today are ";
+              body += naturalJoin(humanRanges);
+              body += ".";
+            }
+          } else if (timeofd === "midday") {
+            title = context.nowUv < 6 ? `You can go, even if it's midday` : "UV is high";
+            const status = context.recommendation === "ok" ? "" :
+                           context.recommendation === "needSunscreen" ? " - you should apply sunscreen" :
+                           context.recommendation === "needStrongSunscreen" ? " - apply sunscreen, reapply every 40-70 minutes" :
+                           context.recommendation === "shade" ? " - apply sunscreen, reapply every 30-50 minutes, go to shade, and it might be better indoors" :
+                           " - don't go outside, stay indoors"
+            body = `UV index (how much the sun burns you) is ${context.nowUv}${status}.`;
+          } else if (timeofd === "afternoon") {
+            title = scoreNow.score >= 8.5 ? `Great beach vibe :)` : scoreNow.score >= 7.5 ? `Nice time on the beach` : `Afternoon on ${beach.name}`;
+            body = scoreNow.score >= 7.5 ? `Go to the beach now, it's good. The beach's weather is ${meteo.codeToLabel(weather.current.weathercode, type="text").toLowerCase()}, and temps are ${weather.current.temperature_2m}°C air and ${marine.current.sea_surface_temperature}°C water. UV is around ${weather.current.uv_index}, and waves are ${marine.current.wave_height}m high.` : scoreNow.score >= 6 ? `It's okay here on ${beach.name}. The beach's weather is ${meteo.codeToLabel(weather.current.weathercode, type="text").toLowerCase()}, and temps are ${weather.current.temperature_2m}°C air and ${marine.current.sea_surface_temperature}°C water. UV is around ${weather.current.uv_index}, and waves are ${marine.current.wave_height}m high.` : `The weather on the beach isn't probably for you, but if you want, you can give it a shot and go.`
+          } else if (timeofd === "evening") {
+            title = `Evening on ${beach.name}, sunset soon at ${context.sunset.format(window.settings.timeFormat)}`;
+            body = `Golden hour from ${context.goldenHour.format(window.settings.timeFormat)} - expect gold glow and orange sky. `
+            body += context.sunsetViewable ? "The sunset can be seen on this beach soon." : "While you won't see the sun from here, the glow will probably be visible from the beach.";
+            body += `<br><br>Weather - ${meteo.codeToLabel(weather.current.weathercode, type="text").toLowerCase()} with ${marine.current.wave_height}m waves, temp ${weather.current.temperature_2m}°C.`;
+          } else { // timeofd === "night"
+            title = context.rainTonight && context.rainTonight.severity !== "none" ? `Don't dry clothes outside tonight, they'll get soaked` : `Night time`;
+            body = context.rainTonight && context.rainTonight.severity !== "none" ? `${sentenceCase(context.rainTonight.severity)} rain expected tonight, drying clothes outside isn't a good idea.` : `It's safe to dry swimming stuff and clothes outside tonight, it shouldn't rain. `;
+            body += `Weather right now: ${meteo.codeToLabel(weather.current.weathercode, type="text").toLowerCase()} with ${marine.current.wave_height}m waves, temp ${weather.current.temperature_2m}°C.`
+            body += `<br><br>Tomorrow's temps should go up to ${daily.tomorrow.maxTemp}°C, with the highest waves being ${daily.tomorrow.maxWaves}m.`;
+          }
+          const hcardNotes = [];
+          if (context.expected) { hcardNotes.push(meteo.codeToLabel(context.expected.code) + " at " + ldate(context.expected.time).format(settings.timeFormat)) }
+          if (context.rainTonight && context.rainTonight.severity !== "none") { hcardNotes.push("👕 Don't dry stuff outside") }
+          hcard.innerHTML = `<span>${conditions}</span>
+          <h2>${title}</h2>
+          ${hcardNotes.length > 0 ? "<div class='beachHeroList'><span class='beachHeroList-item'>" + hcardNotes.join("</span><span class='beachHeroList-item'>") + "</div><br>" : ""}
+          ${body}`
+
+          const extraBox = $("#extraBox");
+          if ((timeofd === "dawn" || window.hackTime === "dawn") && sunriseBeach) {
+            extraBox.className = "card topspace";
+            extraBox.innerHTML = `<strong>Better beach for sunrises</strong>
+            <button class="fullwidth" onclick="beach.html?name=${encodeURIComponent(sunriseBeach.name)}">${sunriseBeach.icon} ${sunriseBeach.name}</button>`;
+          }
+          if ((timeofd === "evening" || window.hackTime === "evening") && sunsetBeach) {
+            extraBox.className = "card topspace";
+            extraBox.innerHTML = `<strong>Better beach for sunsets</strong>
+            <button class="fullwidth" onclick="beach.html?name=${encodeURIComponent(sunsetBeach.name)}">${sunsetBeach.icon} ${sunsetBeach.name}</button>`;
+          }
+        } else {
+          $("#aboutBeachHeader").textContent = `Discover countries`;
+          hcard.className = "card herocard discovery";
+          hcard.innerHTML = `<span>Find your next vacation spot</span>
+          <h2>Discover beaches</h2>
+          Click the button above to pick a beach on the map, or check out one of these countries.`
+          $("#aboutBeach").textContent = "See whether you'll like these countries";
+          Shorebase.countries().sort(() => Math.random() - 0.5).slice(0, 3).forEach(country => {
+            const cBox = document.createElement("button");
+            cBox.style.color = "var(--text)";
+            cBox.className = "fullwidth topspace";
+            cBox.innerHTML = `${["Explore", "Discover", "Check out", "Find cool stuff in", "Look at"][Math.floor(Math.random() * 4)]} ${country}`
+            cBox.onclick = () => { location.href = "map.html?country="+encodeURIComponent(country) };
+            $("#aboutBeach").appendChild(cBox);
+          });
+        }
+      } else {
+        $("#aboutBeachHeader").textContent = `Fav beaches`;
+        hcard.className = "card herocard explorer";
+        hcard.innerHTML = `<span>Find beaches</span>
+        <h2>Explore beaches or pick from favorites</h2>
+        Click the button above to pick a beach on the map, or select one of your favorites here.`
+        const favsBox = $("#aboutBeach");
+        if (window.favs.length === 0) {
+          favsBox.textContent = "No favorites yet.";
+          return;
+        } else {
+          favsBox.textContent = "";
+          favs.slice(0, 3).forEach(fav => {
+            const beach = Shorebase.db.find(b => b.name === fav);
+            console.log(Shorebase.db.find(b => b.name === fav));
+            const el = document.createElement("button");
+            el.className = "fullwidth";
+            console.log({ fav, beach, el });
+            el.style.textAlign = "left";
+            el.innerHTML = `<strong>${beach.name} ${beach.icon}</strong><br>${beach.country}<br>${sentenceCase(beach.type === "pebble" ? beach.type : beach.type + "y")} ${beach.hasBarsOrRestaurants ? "with" : "without"} food`;
+            if (favs[0] !== fav) {
+              const br = document.createElement("br");
+              favsBox.appendChild(br);
+              const br2 = document.createElement("br");
+              favsBox.appendChild(br2);
+            }
+            favsBox.appendChild(el);
+          });
+          const moreLink = document.createElement("a");
+          moreLink.textContent = "See all";
+          moreLink.href = "map.html";
+          favsBox.appendChild(moreLink);
+        }
+      }
+    }
+
+    sbsetup();
+    navigator.permissions.query({ name: "geolocation" }).then(status => {
+      if (status.state === "granted") {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            console.log("Latitude:", pos.coords.latitude);
+            console.log("Longitude:", pos.coords.longitude);
+            setup([pos.coords.latitude, pos.coords.longitude]);
+            $("#enableLocation").remove();
+          },
+          err => {
+            console.log("Error:", err.message);
+            setup(null);
+          }
+        );
+      } else {
+        console.log("Denied or not given location permission, skipping");
+        setup(null);
+      }
+    });
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+    updateGreeting();
+  </script>
+</body>
+</html>

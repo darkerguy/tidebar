@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather preferrences • Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="settings.html">Settings</a> / <strong>Weather</strong></span>
+    <h1>What weather do you like?</h1>
+    <p>Let me know what beach weather you like so the app gives better scores.</p>
+    <label>
+      Air temperature
+      <input type="number" name="temp" id="temp" oninput="localStorage.setItem('tb:tempPref', this.value)" min="-10" max="40" value="25">
+    </label>
+    <label>
+      Water temp
+      <input type="number" name="temp" id="waterTemp" oninput="localStorage.setItem('tb:seaTemp', this.value)" min="-10" max="40" value="25">
+    </label>
+    <br><br>
+    <details>
+      <summary>Comfort room / tolerance</summary>
+      <div class="det-body">
+        <label>
+          Air temp comfort room
+          <input type="number" name="temp" id="temp" oninput="localStorage.setItem('tb:tempTolerance', this.value)" min="0.5" max="15" value="3" step="0.5" list="tempTolDL">
+          <datalist id="tempTolDL">
+            <option value="1">Very low</option>
+            <option value="2">Low</option>
+            <option value="3">Medium</option>
+            <option value="5">High</option>
+            <option value="7">Very high</option>
+          </datalist>
+        </label>
+        <label>
+          Water temp comfort room
+          <input type="number" name="temp" id="waterTemp" oninput="localStorage.setItem('tb:seaTempTolerance', this.value)" min="0.5" max="15" value="2" step="0.5" list="seaTempTolDL">
+          <datalist id="seaTempTolDL">
+            <option value="1">Very low</option>
+            <option value="2">Low</option>
+            <option value="3">Medium</option>
+            <option value="5">High</option>
+            <option value="7">Very high</option>
+          </datalist>
+        </label>
+      </div>
+    </details>
+    
+    <br> 
+    <div class="settingsbox card">
+      <div class="setting stacked">
+        <label><strong>What waves do you like?</strong></label>
+        
+        <div class="stack no-gap" id="waveBoxes">
+          <label><input type="checkbox" id="0.0"/> No waves</label>
+          <label><input type="checkbox" id="0.1"/> Tiny ripples (0.1m)</label>
+          <label><input type="checkbox" id="0.2"/> Little splashes (0.2m)</label>
+          <label><input type="checkbox" id="0.4"/> Small waves (0.4m)</label>
+          <label><input type="checkbox" id="0.7"/> Medium waves (0.7m)</label>
+          <label><input type="checkbox" id="1.0"/> The big ones (1m)</label>
+          <label><input type="checkbox" id="1.2"/> Giant waves (1.2m)</label>
+          <label><input type="checkbox" id="1.5"/> A bit crazy (1.5m)</label>
+          <label><input type="checkbox" id="1.8"/> Maybe too crazy... (1.8m)</label>
+          <label><input type="checkbox" id="2.0"/> Surfer's paradise (2m)</label>
+        </div>
+      </div>
+    </div>
+    
+    <h2>What do you think about the wind?</h2>
+    <p>Select which of these are you okay with when you're on the beach.</p>
+
+    <div class="settingsbox card">
+      <div class="setting">
+        <label for="windp-no">
+          <strong>I don't like wind</strong><br>
+          It's better for you if there is little or no wind (&lt;5 km/h).
+        </label>
+        <input type="radio" name="windp" id="windp-no" value="noWind">
+      </div>
+      <div class="setting">
+        <label for="windp-small">
+          <strong>I'm fine with small winds, but don't let it be too much.</strong><br>
+          You're fine with a light breeze but wind isn't your favorite. (&lt;15 km/h).
+        </label>
+        <input type="radio" name="windp" id="windp-small" value="smallWind">
+      </div>
+      <div class="setting">
+        <label for="windp-breeze">
+          <strong>I like a nice breeze, but I don't want it too wild.</strong><br>
+          You don't want still air, but not too much (3-15 km/h).
+        </label>
+        <input type="radio" name="windp" id="windp-breeze" value="likeBreeze">
+      </div>
+      <div class="setting">
+        <label for="windp-any">
+          <strong>Any wind's good, but I don't want still air or too extreme winds</strong><br>
+          You want wind, and as long as it's not crazy, you're fine (5-20 km/h).
+        </label>
+        <input type="radio" name="windp" id="windp-any" value="anyWind">
+      </div>
+      <div class="setting">
+        <label for="windp-fresh">
+          <strong>I like refreshing winds, but I don't want my towel to fly into another country.</strong><br>
+          You prefer slightly windy weather, but you don't want your stuff to leave the beach (10-25 km/h).
+        </label>
+        <input type="radio" name="windp" id="windp-fresh" value="freshWind">
+      </div>
+      <div class="setting">
+        <label for="windp-madness">
+          <strong>I love it when the beach becomes windy chaos.</strong><br>
+          It looks like you might be a surfer, because this is the point where it stops feeling like a beach and more like the wild wild west (20-40 km/h).
+        </label>
+        <input type="radio" name="windp" id="windp-madness" value="wildWildWest">
+      </div>
+    </div>
+
+    <h2>Skin sensitivity (UV)</h2>
+    <p>Select your skin sensitivity.</p>
+    <select name="skinSens" id="skinSens" onclick="localStorage.setItem('tb:skinSens', this.value)">
+      <option value="normal">Normal</option>
+      <option value="high">Sensitive</option>
+    </select>
+
+    <h2>I'm okay with...</h2>
+    <p>Select which of these are you okay with when you're on the beach.</p>
+
+    <div class="settingsbox card">
+      <div class="setting">
+        <label for="okayFog">
+          <strong>Mild fog</strong><br>
+          Some fog or haze doesn't bother you.
+        </label>
+        <input type="checkbox" name="okayFog" id="okayFog" class="toggle" onchange="localStorage.setItem('tb:okayFog', this.checked)">
+      </div>
+      <div class="setting">
+        <label for="okayClouds">
+          <strong>Clouds</strong><br>
+          You don't mind when the sky is all cloudy and moody.
+        </label>
+        <input type="checkbox" id="okayClouds" class="toggle" onchange="localStorage.setItem('tb:okayClouds', this.checked)">
+      </div>
+      <div class="setting">
+        <label for="okayRain">
+          <strong>Light rain</strong><br>
+          When it's slightly rainy, you still like it at the beach, so Tidebar won't drop scores for tiny drizzle or small showers.
+        </label>
+        <input type="checkbox" id="okayRain" class="toggle" onchange="localStorage.setItem('tb:okayRain', this.checked)">
+      </div>
+    </div>
+
+  </main>
+  <footer class="related">
+    <span><strong>Related settings</strong></span>
+    <button class="link" onclick="location.href = 'dtedit.html'">Datetime</button>
+    <button class="link" onclick="location.href = 'geocfg.html'">Change preferred beach type</button>
+  </footer>
+
+  <script>
+    document.getElementById("temp").value = window.settings.tempPref;
+    document.getElementById("waterTemp").value = window.settings.seaTemp;
+      const wavePrefs = JSON.parse(window.settings.wavePrefs.replace(/'/g, '"'));
+      wavePrefs.forEach(w => {
+        const checkbox = document.getElementById(w);
+        if (checkbox) checkbox.checked = true;
+      });
+    document.querySelectorAll("#waveBoxes input").forEach(box => {
+      box.onchange = () => {
+        const boxes = document.querySelectorAll("#waveBoxes input");
+        const selected = Array.from(boxes)
+          .filter(b => b.checked)
+          .map(b => b.id);
+        localStorage.setItem("tb:wavePrefs", JSON.stringify(selected));
+      };
+    });
+    document.getElementById("skinSens").value = window.settings.skinSens;
+    document.getElementById("okayFog").value = window.settings.okayFog;
+    document.getElementById("okayClouds").value = window.settings.okayClouds;
+    document.getElementById("okayRain").value = window.settings.okayRain;
+    document.radioGroup("windp").value = window.settings.windPref;
+    document.radioGroup("windp").radios.forEach(r => {
+      r.addEventListener("change", () => {
+        localStorage.setItem("tb:windPref", r.value);
+      });
+    });
+  </script>
+</body>
+</html>

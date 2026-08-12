@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your data and privacy • Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-timezone-offset@1.0.0/dist/index.min.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="settings.html">Settings</a> / <strong>Data</strong></span>
+    <h1>Data, privacy and storage</h1>
+    <p>Manage your data in Tidebar.</p>
+
+    <div class="settingsbox card">
+      <div class="setting">
+        <label for="getBackup">
+          <strong>Get backup</strong><br>
+          Download a JSON backup to use to transfer data to another device or recover your data if your browser storage got cleared.
+        </label>
+        <button class="primary" id="getBackup" onclick="getCodeAndOpenPopup()">Get backup</button>
+      </div>
+      <div class="setting">
+        <label for="useBackup">
+          <strong>Use your backup</strong><br>
+          Use a JSON backup to recover your stuff.
+        </label>
+        <button onclick="location.href = 'restore.html'">Load JSON</button>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div class="settingsbox card danger">
+      <div class="setting">
+        <label for="delete">
+          <strong>Delete your data</strong><br>
+          Delete some or all of your data. This can't be undone.
+        </label>
+        <button class="danger" id="delete" onclick="document.getElementById('deletionConfirm').showModal()">Delete</button>
+      </div>
+    </div>
+
+    <h2>Local beach info</h2>
+    <p>The app relies on <a href="https://darkerguy.github.io/shorebsae">Shorebase</a> to function. Shorebase is a big database of 370+ beaches all over the world and it has metadata about them. It's about 500 KB total, and on mobile, it's a good idea to download it locally.</p>
+    <div class="card" id="localDbCard"></div>
+
+    <h2>Favorites</h2>
+    <p>Manage favorites and remove them. Click one to remove it.</p>
+    <div id="favBox"></div>
+    <button class="danger topspace" onclick="if (confirm('Clear all favorites?')) {favs = []; localStorage.setItem('tb:favs', '[]'); location.reload()}">Clear all</button>
+  </main>
+  <footer class="related">
+    <span><strong>Related settings</strong></span>
+    <button class="link" onclick="location.href = 'geocfg.html'">Change location data and options</button>
+  </footer>
+  <dialog id="getCode">
+    <div class="wrapper">
+      <div class="header">
+        <h2>Backup code</h2>
+        <p>Here's your JSON code</p>
+      </div>
+      <div class="content">
+        <input type="text" name="codeField" id="codeField" readonly>
+      </div>
+      <div class="footer">
+        <div class="row">
+          <button class="push primary" onclick="document.getElementById('getCode').close()"">Close</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="deletionConfirm" class="colorIntent-danger">
+    <div class="wrapper">
+      <div class="header">
+        <h2 class="text-heat">Delete your data</h2>
+        <p>Are you sure you want to delete all of your data?</p>
+      </div>
+      <div class="content">
+        This will remove all of your data from the app, including:
+        <ul>
+          <li>Favorites</li>
+          <li>Settings</li>
+          <li>Weather preferrences</li>
+          <li>Themes</li>
+        </ul>
+        <strong>It's impossible to undo this. Are you sure?</strong>
+        <p>If you wanted to clear favorites or remove history without deleting your data, do it on this Data settings page, below the Delete button.</p>
+      </div>
+      <div class="footer">
+        <div class="row">
+          <button onclick="document.getElementById('deletionConfirm').close()">Cancel</button>
+          <button class="push danger" onclick="document.getElementById('deletionConfirm').close(); document.getElementById('deletionConfirm2').showModal()">Continue</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="deletionConfirm2" class="colorIntent-danger">
+    <div class="wrapper">
+      <div class="header">
+        <h2 class="text-heat">Delete your data</h2>
+        <p>Confirm you want to delete it</p>
+      </div>
+      <div class="content">
+        This will remove all your data from the app, forever. There is no cancelling after this.<br>
+        <label for="deletionConfirmBox"><strong>Type <code>delete</code> to confirm.</strong></label>
+        <input type="text" name="idk" id="deletionConfirmBox" oninput="document.getElementById('deletionConfirmBtn').disabled = this.value.toLowerCase() !== 'delete'">
+      </div>
+      <div class="footer">
+        <div class="row">
+          <button onclick="document.getElementById('deletionConfirm2').close()">Cancel</button>
+          <button onclick="document.getElementById('deletionConfirm2').close(); document.getElementById('deletionConfirm').showModal()">Back</button>
+          <button class="push primary" disabled id="deletionConfirmBtn" onclick="document.getElementById('deletionConfirm2').close()">Yes, delete it all</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <script>
+    const dbcard = $("#localDbCard");
+    if (localStorage.getItem("shorebase") === "" || localStorage.getItem("shorebase") === null) {
+      dbcard.innerHTML = `There is no downloaded version of Shorebase.<br><br><button onclick="downloadDB()">Download</button>`;
+    } else {
+      dbcard.innerHTML = `The database was saved locally by ${localStorage.getItem("shorebaseAuthor")}.<br><br><button onclick="downloadDB()">Update</button>   <button onclick="if (confirm('Delete local save of Shorebase?')) { localStorage.removeItem('shorebase'); localStorage.removeItem('shorebaseAuthor'); location.reload() }">Remove</button>`;
+    }
+
+    const favBox = $("#favBox");
+    favs.forEach(fav => {
+      const btn = document.createElement("button");
+      btn.className = "topspace fullwidth";
+      btn.textContent = fav;
+      btn.onclick = () => { if (confirm("Remove " + fav + "from favorites?")) { favs.removeFav(fav); location.reload() } };
+      favBox.appendChild(btn);
+    });
+
+    function downloadDB() {
+      Shorebase.loadSync();
+      localStorage.setItem("shorebase", JSON.stringify(Shorebase.db));
+      localStorage.setItem("shorebaseAuthor", "Tidebar");
+      location.reload();
+    }
+
+    function getCode() {
+      const result = {};
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+      
+        if (key.startsWith("tb:")) {
+          result[key] = localStorage.getItem(key);
+        }
+      }
+
+      result._timestamp = new Date().toISOString();
+
+      return JSON.stringify(result);
+    }
+
+    function getCodeAndOpenPopup() {
+      code = getCode();
+      $("#codeField").value = code;
+      $("#getCode").showModal();
+    }
+  </script>
+</body>
+</html>

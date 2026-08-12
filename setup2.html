@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Pick your vibe</h1>
+    <p>If you want, u can select a theme for the app. You can change more later.</p>
+    <div class="theme-grid">
+      <label class="themecard">
+        <input type="radio" name="theme" id="theme-coastline" value="coastline">
+        <span class="icon">🌊</span>
+        <span class="name">Coastline</span>
+      </label>
+      <label class="themecard">
+        <input type="radio" name="theme" id="theme-bura" value="bura">
+        <span class="icon">💨</span>
+        <span class="name">Bura</span>
+      </label>
+      <label class="themecard">
+        <input type="radio" name="theme" id="theme-twilight" value="twilight">
+        <span class="icon">🌅</span>
+        <span class="name">Twilight</span>
+      </label>
+      <label class="themecard">
+        <input type="radio" name="theme" id="theme-jungle" value="jungle">
+        <span class="icon">🌴</span>
+        <span class="name">Jungle</span>
+      </label>
+      <label class="themecard">
+        <input type="radio" name="theme" id="theme-night" value="night">
+        <span class="icon">🌙</span>
+        <span class="name">Night</span>
+      </label>
+      <label class="themecard">
+        <input type="radio" name="theme" id="theme-rocks" value="rocks">
+        <span class="icon">🪨</span>
+        <span class="name">Rocks</span>
+      </label>
+    </div>
+  </main>
+  <footer>
+    <div class="row">
+      <button class="push" onclick="location.href = 'setup1.html'">Back</button>
+      <button class="primary" onclick="location.href = 'setup3.html'">Next</button>
+    </div>
+  </footer>
+  <script>
+    document.radioGroup("theme").value = window.settings.theme;
+    document.radioGroup("theme").radios.forEach(r => {
+      r.onclick = () => { window.applyTheme(r.value) };
+    });
+  </script>
+</body>
+</html>

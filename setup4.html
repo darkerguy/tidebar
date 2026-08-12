@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <h1>What kinds of beaches do you enjoy?</h1>
+    <p>If Tidebar suggests nearby beaches, it will prefer these beach types.</p>
+    <label class="checkcard"><input type="radio" name="type" id="type-sand" value="sand">
+      <span><strong>Sandy beaches</strong><br>You like nice beaches with sand. I like sand too.</span>
+    </label><br>
+    <label class="checkcard"><input type="radio" name="type" id="type-pebble" value="pebble">
+      <span><strong>Pebble beaches</strong><br>Tidebar will recommend beaches with pebbles.</span>
+    </label><br>
+    <label class="checkcard"><input type="radio" name="type" id="type-rock" value="rock">
+      <span><strong>Rocky beaches</strong><br>rock.</span>
+    </label><br>
+    <label class="checkcard"><input type="radio" name="type" id="type-nopref" value="nopref">
+      <span><strong>I don't care</strong><br>You don't care that much abouut beach type.</span>
+    </label><br>
+  </main>
+  <footer>
+    <div class="row">
+      <button class="push" onclick="location.href = 'setup3.html'">Back</button>
+      <button class="primary" onclick="location.href = 'setupdone.html'">Next</button>
+    </div>
+  </footer>
+  <script>
+    document.radioGroup("type").value = window.settings.beachType;
+    document.radioGroup("type").radios.forEach(r => {
+      r.onclick = () => { localStorage.setItem("tb:beachType", r.value) };
+    });
+  </script>
+</body>
+</html>

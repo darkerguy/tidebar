@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <h1>What beach weather do you like?</h1>
+    <p>It's optional - but Tidebar will use it to personalize the beach score and other stuff if you do select it.</p>
+    <h2>Select what temperature you like</h2>
+    <p>Pick what you enjoy the most.</p>
+    <div class="settingsbox card">
+      <div class="setting">
+        <label for="temp-chill">
+          <strong>Cool and chill</strong><br>
+          You think it's great when the temperature is around 23°C and it isn't too hot.
+        </label>
+        <input type="radio" name="temp" id="temp-chill" value="23">
+      </div>
+      <div class="setting">
+        <label for="temp-mild">
+          <strong>Mild air, colder water</strong><br>
+          You enjoy warm-ish air with cooler water.
+        </label>
+        <input type="radio" name="temp" id="temp-mild" value="26">
+      </div>
+      <div class="setting">
+        <label for="temp-warm">
+          <strong>Nice and warm</strong><br>
+          You like it with some heat.
+        </label>
+        <input type="radio" name="temp" id="temp-warm" value="29">
+      </div>
+      <div class="setting">
+        <label for="temp-hot">
+          <strong>Hot hot hot 🔥</strong><br>
+          You love yourself some high temps!
+        </label>
+        <input type="radio" name="temp" id="temp-hot" value="31">
+      </div>
+    </div>
+
+    <h2>Are you a surfer?</h2>
+    <p>This is used for customizing waves stuff.</p>
+    <div class="settingsbox card">
+      <div class="setting">
+        <label for="surf-yep">
+          <strong>🏄‍♂️ YES I AM!</strong><br>
+          Surfing needs giant waves, so Tidebar will prefer those from now on.
+        </label>
+        <input type="radio" name="surf" id="surf-yep" value="['1.0', '1.2', '1.5', '1.8', '2.0']">
+      </div>
+      <div class="setting">
+        <label for="surf-cool">
+          <strong>😎 Nah, but big waves are cool!</strong><br>
+          You prefer big waves over tiny ones, because they're more fun and less boring.
+        </label>
+        <input type="radio" name="surf" id="surf-cool" value="['0.4', '0.7', '1.0', '1.2']">
+      </div>
+      <div class="setting">
+        <label for="surf-nah">
+          <strong>🍹 No, I want it nice and chill</strong><br>
+          You don't like big waves that much...
+        </label>
+        <input type="radio" name="surf" id="surf-nah" value="['0.1', '0.2', '0.4']">
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="row">
+      <button class="push" onclick="location.href = 'setup2.html'">Back</button>
+      <button class="primary" onclick="location.href = 'setup4.html'">Next</button>
+    </div>
+  </footer>
+  <script>
+    const airSeaTempMap = {
+      "23": "22",
+      "26": "23",
+      "29": "27",
+      "31": "28",
+    };
+    document.radioGroup("temp").value = window.settings.tempPref;
+    document.radioGroup("temp").radios.forEach(r => {
+      r.onclick = () => { localStorage.setItem("tb:tempPref", r.value); localStorage.setItem("tb:seaTemp", airSeaTempMap[r.value]) };
+    });
+    document.radioGroup("surf").value = window.settings.wavePrefs;
+    document.radioGroup("surf").radios.forEach(r => {
+      r.onclick = () => { localStorage.setItem("tb:wavePrefs", r.value) };
+    });
+  </script>
+</body>
+</html>

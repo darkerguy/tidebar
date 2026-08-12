@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location and notifications • Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <span><a href="settings.html">Settings</a> / <strong>Location, map and geography</strong></span>
+    <h1>Map and location options</h1>
+    <p>Customize stuff related to maps, location, and this kind of stuff.</p>
+
+    <h2>Location</h2>
+    <p>Enable location access for more personalized home screen and other cool stuff. No tracking, your location stays on your computer or phone.</p>
+    <button id="enableLocation" class="primary" onclick="enableLocation()">Enable</button>
+
+    <h2>Preferred beach type</h2>
+    <p>You can select this to make the app recommend the beaches you like.</p>
+    <select name="beachType" id="beachType" onchange="localStorage.setItem('tb:beachType', this.value)">
+      <option value="nopref">I don't care</option>
+      <option value="sand">Sand</option>
+      <option value="pebble">Pebble</option>
+      <option value="rock">Rock</option>
+    </select>
+  </main>
+  <footer class="related">
+    <span><strong>Related settings</strong></span>
+    <button class="link" onclick="location.href = 'dtedit.html'">Datetime</button>
+    <button class="link" onclick="location.href = 'prefweather.html'">Change preferred weather</button>
+  </footer>
+
+  <script>
+    navigator.permissions.query({ name: "geolocation" }).then(result => {
+      if (result.state === "granted") {
+        $("#enableLocation").textContent = "Enabled, thank you";
+        $("#enableLocation").disabled = true;
+      }
+    });
+    document.getElementById("beachType").value = window.settings.beachType;
+  </script>
+</body>
+</html>

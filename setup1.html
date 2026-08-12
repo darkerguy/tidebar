@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidebar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="setup.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+  <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://darkerguy.github.io/shorebase/api.js"></script>
+</head>
+<body>
+  <main>
+    <h1>How should I call you?</h1>
+    <p>You can optionally enter a username that I will use on the homepage. It's completely up to you, and it stays on your device, not on some shady server in Silicon Valley.</p>
+    <input type="text" id="name" placeholder="Username" oninput="localStorage.setItem('tb:username', this.value)">
+  </main>
+  <footer>
+    <div class="row">
+      <button class="push" onclick="location.href = 'setup.html'">Back</button>
+      <button class="primary" onclick="location.href = 'setup2.html'">Next</button>
+    </div>
+  </footer>
+  <script>
+    document.getElementById("name").value = window.settings.username;
+  </script>
+</body>
+</html>
