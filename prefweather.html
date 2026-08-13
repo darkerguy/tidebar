@@ -156,9 +156,9 @@
       };
     });
     document.getElementById("skinSens").value = window.settings.skinSens;
-    document.getElementById("okayFog").value = window.settings.okayFog;
-    document.getElementById("okayClouds").value = window.settings.okayClouds;
-    document.getElementById("okayRain").value = window.settings.okayRain;
+    document.getElementById("okayFog").checked = window.settings.okayFog === "true";
+    document.getElementById("okayClouds").checked = window.settings.okayClouds === "true";
+    document.getElementById("okayRain").checked = window.settings.okayRain === "true";
     document.getElementById("minWind").value = window.settings.minWind;
     document.getElementById("maxWind").value = window.settings.maxWind;
   </script>
