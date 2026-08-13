@@ -36,22 +36,22 @@ window.meteo.genScore = (temp, waterTemp, cloudCover, windSpeed, weatherCode, wa
   }
 
   let windPunish = 0;
-  
+
   const minWind = Number(window.settings.minWind);
   const maxWind = Number(window.settings.maxWind);
-  
+
   // Too calm
   if (windSpeed < minWind) {
     const diff = roundTo(minWind - windSpeed, 1);
     windPunish = diff <= 3 ? diff * 0.3 : diff * 0.6;
   }
-  
+
   // Too windy
   else if (windSpeed > maxWind) {
     const diff = roundTo(windSpeed - maxWind, 1);
     windPunish = diff <= 5 ? diff * 0.3 : diff * 0.7;
   }
-  
+
   windPunish = roundTo(windPunish, 1);
   score = roundTo(score - windPunish, 1);
 
@@ -159,7 +159,7 @@ window.meteo.genScore = (temp, waterTemp, cloudCover, windSpeed, weatherCode, wa
   } else {
     humidPunish = 0;
   }
-  humidPunish = Math.min(humidPunish, 6)
+  humidPunish = Math.min(humidPunish, 3.5)
 
   score = roundTo(score - humidPunish, 1);
 
