@@ -550,6 +550,10 @@ select.force-default {
   color: color-mix(in srgb, var(--bold) 50%, navy);
 }
 
+.text-drought {
+  color: color-mix(in srgb, var(--bold) 40%, olive);
+}
+
 code {
   font-family: "Cascadia Code", "Courier New", Courier, monospace;
 }
@@ -986,66 +990,135 @@ details {
     background: linear-gradient(135deg, #050a47, #150136);
     --text: #befb;
     --bold: #bef;
+
+    & button.herobtn {
+      background: #bef;
+      color: #05023d;
+    }
   }
   &.dawn {
     background: linear-gradient(135deg, #050a47, #4c95af);
     --text: #befb;
     --bold: #bef;
+
+    & button.herobtn {
+      background: #bef;
+      color: #0c5869;
+    }
   }
   &.earlyMorning {
     background: linear-gradient(135deg, #5889ff, #f5f889);
     --text: #000b;
     --bold: #000;
+
+    & button.herobtn {
+      background: black;
+      color: #fff1cb;
+    }
   }
   &.morning {
     background: linear-gradient(135deg, #58abff, #ffffd4);
     --text: #000b;
     --bold: #000;
+
+    & button.herobtn {
+      background: black;
+      color: #e1f2ff;
+    }
   }
   &.midday {
     background: linear-gradient(135deg, #5dc6ff, #f7feff);
     --text: #000b;
     --bold: #000;
+
+    & button.herobtn {
+      background: black;
+      color: #ffffff;
+    }
   }
   &.afternoon {
     background: linear-gradient(135deg, #5decff, #dbffdb);
     --text: #000b;
     --bold: #000;
+
+    & button.herobtn {
+      background: black;
+      color: #85f0ea;
+    }
   }
   &.evening {
     background: linear-gradient(135deg, #ffe600, #ffc400);
     --text: #210b;
     --bold: #210;
+
+    & button.herobtn {
+      background: #210;
+      color: #ffd500;
+    }
   }
   &.night {
     background: linear-gradient(135deg, #050e70, #1d004a);
     --text: #aafb;
     --bold: #aaf;
+
+    & button.herobtn {
+      background: #aaf;
+      color: #1a0263;
+    }
   }
   &.foggy {
     background: linear-gradient(135deg, #c8cace, #a6a6b0);
     --text: #000b;
     --bold: #000;
+
+    & button.herobtn {
+      background: black;
+      color: #d3d3d9;
+    }
   }
   &.cloud {
     background: linear-gradient(135deg, #6f6f6f, #52526d);
     --text: #befb;
     --bold: #bef;
+
+    & button.herobtn {
+      background: #bef;
+      color: #4a4a5b;
+    }
   }
   &.bad {
     background: linear-gradient(135deg, #606060, #f88f89);
     --text: #fffb;
     --bold: #fff;
+
+    & button.herobtn {
+      background: white;
+      color: #816060;
+    }
   }
   &.discovery {
     background: linear-gradient(135deg, #3d8635, #8b3d63);
     --text: #fffb;
     --bold: #fff;
+
+    & button.herobtn {
+      background: white;
+      color: #299654;
+    }
   }
   &.explorer {
     background: linear-gradient(135deg, #867735, #745d16);
     --text: #fffb;
     --bold: #fff;
+
+    & button.herobtn {
+      background: white;
+      color: #867735;
+    }
+  }
+
+  & button.herobtn {
+    border: none;
   }
 }
 
@@ -1186,4 +1259,9 @@ details.warningItem {
 .colorIntent-danger {
   --primary: var(--danger);
   --primary-hover: color-mix(in srgb, var(--danger) 85%, var(--bold));
+}
+
+hr {
+  border: 1px solid var(--border);
+  border-width: 1px 0 0 0;
 }

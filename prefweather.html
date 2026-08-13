@@ -74,51 +74,27 @@
     </div>
     
     <h2>What do you think about the wind?</h2>
-    <p>Select which of these are you okay with when you're on the beach.</p>
+    <p>Select what wind is our favorite hen you're on the beach.</p>
 
-    <div class="settingsbox card">
-      <div class="setting">
-        <label for="windp-no">
-          <strong>I don't like wind</strong><br>
-          It's better for you if there is little or no wind (&lt;5 km/h).
-        </label>
-        <input type="radio" name="windp" id="windp-no" value="noWind">
+    <div class="card">
+      <h3 class="centered rmspace top">Wind range</h3>
+      <div class="row snap">
+        <input type="text" id="minWind" placeholder="Min wind (km/h)" oninput="localStorage.setItem('tb:minWind', this.value)" style="min-width: 0; text-align: center;">
+        <input type="text" id="maxWind" placeholder="Max wind (km/h)" oninput="localStorage.setItem('tb:maxWind', this.value)" style="min-width: 0; text-align: center;">
       </div>
-      <div class="setting">
-        <label for="windp-small">
-          <strong>I'm fine with small winds, but don't let it be too much.</strong><br>
-          You're fine with a light breeze but wind isn't your favorite. (&lt;15 km/h).
-        </label>
-        <input type="radio" name="windp" id="windp-small" value="smallWind">
-      </div>
-      <div class="setting">
-        <label for="windp-breeze">
-          <strong>I like a nice breeze, but I don't want it too wild.</strong><br>
-          You don't want still air, but not too much (3-15 km/h).
-        </label>
-        <input type="radio" name="windp" id="windp-breeze" value="likeBreeze">
-      </div>
-      <div class="setting">
-        <label for="windp-any">
-          <strong>Any wind's good, but I don't want still air or too extreme winds</strong><br>
-          You want wind, and as long as it's not crazy, you're fine (5-20 km/h).
-        </label>
-        <input type="radio" name="windp" id="windp-any" value="anyWind">
-      </div>
-      <div class="setting">
-        <label for="windp-fresh">
-          <strong>I like refreshing winds, but I don't want my towel to fly into another country.</strong><br>
-          You prefer slightly windy weather, but you don't want your stuff to leave the beach (10-25 km/h).
-        </label>
-        <input type="radio" name="windp" id="windp-fresh" value="freshWind">
-      </div>
-      <div class="setting">
-        <label for="windp-madness">
-          <strong>I love it when the beach becomes windy chaos.</strong><br>
-          It looks like you might be a surfer, because this is the point where it stops feeling like a beach and more like the wild wild west (20-40 km/h).
-        </label>
-        <input type="radio" name="windp" id="windp-madness" value="wildWildWest">
-      </div>
+      <hr>
+      <h3 class="rmspace top">Wind explanation</h3>
+      <p>If input in km/h feels too weird to you, here's how different wind speeds feel.</p>
+      <ul>
+        <li><strong class="text-drought"><i class="ph ph-sun-dim text-drought"></i> 0-2 km/h</strong> • Dead air. No wind, but the air might feel too heavy, still or boring.</li>
+        <li><strong class="text-palm"><i class="ph ph-leaf text-palm"></i> 3-6 km/h</strong> • Light air. There is some wind, but not much. Leaves sway.</li>
+        <li><strong class="text-coast"><i class="ph ph-wind text-coast"></i> 7-12 km/h</strong> • Breeze. This is the wind many people like, towels slightly move, waves exist but aren't very big.</li>
+        <li><strong class="text-ocean"><i class="ph ph-waves text-ocean"></i> 13-18 km/h</strong> • Fresh wind. Like breeze, but unsecured towels might wiggle and slightly move, with waves slightly picking up.</li>
+        <li><strong class="text-sun"><i class="ph ph-island text-sun"></i> 19-26 km/h</strong> • Moderate wind. Insecure stuff might start travelling alone, and the wind starts being very noticable.</li>
+        <li><strong class="text-heat"><i class="ph ph-towel text-heat"></i> 27-35 km/h</strong> • Strong wind. Unless you place rocks on it, your towel will try to escape.</li>
+        <li><strong class="text-ultraheat"><i class="ph ph-island text-ultraheat"></i> 36+ km/h</strong> • Insane wind. If you want to keep your belongings, be careful so they don't fly away into another country.</li>
+      </ul>
+      <small>This is not Beaufort scale. It's just how I see the winds.</small>
     </div>
 
     <h2>Skin sensitivity (UV)</h2>
@@ -183,12 +159,8 @@
     document.getElementById("okayFog").value = window.settings.okayFog;
     document.getElementById("okayClouds").value = window.settings.okayClouds;
     document.getElementById("okayRain").value = window.settings.okayRain;
-    document.radioGroup("windp").value = window.settings.windPref;
-    document.radioGroup("windp").radios.forEach(r => {
-      r.addEventListener("change", () => {
-        localStorage.setItem("tb:windPref", r.value);
-      });
-    });
+    document.getElementById("minWind").value = window.settings.minWind;
+    document.getElementById("maxWind").value = window.settings.maxWind;
   </script>
 </body>
 </html>

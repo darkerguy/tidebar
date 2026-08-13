@@ -35,68 +35,24 @@ window.meteo.genScore = (temp, waterTemp, cloudCover, windSpeed, weatherCode, wa
     cloudPunish = 0;
   }
 
-  let windPunish; let windDiff;
-
-  switch (window.settings.windPref) {
-    case "noWind":
-      windDiff = roundTo(Math.max(windSpeed - 5, 0), 1);
-      windPunish = windDiff <= 2 ? windDiff * 0.4 : (windDiff <= 7 ? windDiff * 0.7 : windDiff * 1.2);
-      break;
-    case "smallWind":
-      windDiff = roundTo(Math.max(windSpeed - 15, 0), 1);
-      windPunish = windDiff <= 5 ? windDiff * 0.3 : windDiff * 0.6;
-      break;
-    case "likeBreeze":
-      if (windSpeed < 3) {
-        windDiff = roundTo(3 - windSpeed, 1);
-        windPunish = windDiff <= 2 ? windDiff * 0.3 : windDiff * 0.5;
-      } else if (windSpeed > 15) {
-        windDiff = roundTo(windSpeed - 15, 1);
-        windPunish = windDiff <= 10 ? windDiff * 0.4 : windDiff * 0.7;
-      } else {
-        windPunish = 0;
-      }
-      break;
-    case "anyWind":
-      if (windSpeed < 5) {
-        windDiff = roundTo(5 - windSpeed, 1);
-        windPunish = windDiff <= 3 ? windDiff * 0.2 : windDiff * 0.4;
-      } else if (windSpeed > 20) {
-        windDiff = roundTo(windSpeed - 20, 1);
-        windPunish = windDiff <= 12 ? windDiff * 0.3 : windDiff * 0.5;
-      } else {
-        windPunish = 0;
-      }
-      break;
-    case "freshWind":
-      if (windSpeed < 10) {
-        windDiff = roundTo(10 - windSpeed, 1);
-        windPunish = windDiff <= 5 ? windDiff * 0.4 : windDiff * 0.7;
-      } else if (windSpeed > 25) {
-        windDiff = roundTo(windSpeed - 25, 1);
-        windPunish = windDiff <= 10 ? windDiff * 0.5 : windDiff * 0.7;
-      } else {
-        windPunish = 0;
-      }
-      break;
-    case "wildWildWest":
-      if (windSpeed < 20) {
-        windDiff = roundTo(20 - windSpeed, 1);
-        windPunish = windDiff <= 5 ? windDiff * 0.6 : windDiff * 1.3;
-      } else if (windSpeed > 40) {
-        windDiff = roundTo(windSpeed - 40, 1);
-        windPunish = windDiff <= 5 ? windDiff * 0.7 : windDiff * 1;
-      } else {
-        windPunish = 0;
-      }
-      break;
+  let windPunish = 0;
   
-    default:
-      break;
+  const minWind = Number(window.settings.minWind);
+  const maxWind = Number(window.settings.maxWind);
+  
+  // Too calm
+  if (windSpeed < minWind) {
+    const diff = roundTo(minWind - windSpeed, 1);
+    windPunish = diff <= 3 ? diff * 0.3 : diff * 0.6;
   }
-
+  
+  // Too windy
+  else if (windSpeed > maxWind) {
+    const diff = roundTo(windSpeed - maxWind, 1);
+    windPunish = diff <= 5 ? diff * 0.3 : diff * 0.7;
+  }
+  
   windPunish = roundTo(windPunish, 1);
-
   score = roundTo(score - windPunish, 1);
 
   const weatherCodePenalties = {
@@ -286,8 +242,8 @@ window.meteo.genWarnings = (weather, marine) => {
   const windElevatedIdx = [];
 
   wind.forEach((ws, i) => {
-    if (ws >= 25) windIdx.push(i);
-    if (ws >= 40) windElevatedIdx.push(i);
+    if (ws >= 35) windIdx.push(i);
+    if (ws >= 50) windElevatedIdx.push(i);
   });
 
   buildWarning("wind", windIdx, windElevatedIdx).forEach(w => warnings.push(w));

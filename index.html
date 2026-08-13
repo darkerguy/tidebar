@@ -236,18 +236,19 @@
           hcard.innerHTML = `<span>${conditions}</span>
           <h2>${title}</h2>
           ${hcardNotes.length > 0 ? "<div class='beachHeroList'><span class='beachHeroList-item'>" + hcardNotes.join("</span><span class='beachHeroList-item'>") + "</div><br>" : ""}
-          ${body}`
+          ${body}<br>
+          <button class="herobtn topspace" onclick="location.href = 'beach.html?name=${encodeURIComponent(beach.name)}'">More details</button>`
 
           const extraBox = $("#extraBox");
           if ((timeofd === "dawn" || window.hackTime === "dawn") && sunriseBeach) {
             extraBox.className = "card topspace";
             extraBox.innerHTML = `<strong>Better beach for sunrises</strong>
-            <button class="fullwidth" onclick="beach.html?name=${encodeURIComponent(sunriseBeach.name)}">${sunriseBeach.icon} ${sunriseBeach.name}</button>`;
+            <button class="fullwidth" onclick="location.href = 'beach.html?name=${encodeURIComponent(sunriseBeach.name)}'">${sunriseBeach.icon} ${sunriseBeach.name}</button>`;
           }
           if ((timeofd === "evening" || window.hackTime === "evening") && sunsetBeach) {
             extraBox.className = "card topspace";
             extraBox.innerHTML = `<strong>Better beach for sunsets</strong>
-            <button class="fullwidth" onclick="beach.html?name=${encodeURIComponent(sunsetBeach.name)}">${sunsetBeach.icon} ${sunsetBeach.name}</button>`;
+            <button class="fullwidth" onclick="location.href = 'beach.html?name=${encodeURIComponent(sunsetBeach.name)}'">${sunsetBeach.icon} ${sunsetBeach.name}</button>`;
           }
         } else {
           $("#aboutBeachHeader").textContent = `Discover countries`;

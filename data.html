@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
   <link rel="shortcut icon" href="logo.png" type="image/png">
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://darkerguy.github.io/shorebase/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-timezone-offset@1.0.0/dist/index.min.js"></script>
 </head>
@@ -116,7 +117,7 @@
         <div class="row">
           <button onclick="document.getElementById('deletionConfirm2').close()">Cancel</button>
           <button onclick="document.getElementById('deletionConfirm2').close(); document.getElementById('deletionConfirm').showModal()">Back</button>
-          <button class="push primary" disabled id="deletionConfirmBtn" onclick="document.getElementById('deletionConfirm2').close()">Yes, delete it all</button>
+          <button class="push primary" disabled id="deletionConfirmBtn" onclick="document.getElementById('deletionConfirm2').close(); delData()">Yes, delete it all</button>
         </div>
       </div>
     </div>
@@ -148,7 +149,7 @@
     function getCode() {
       const result = {};
 
-      for (let i = 0; i < localStorage.length; i++) {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
       
         if (key.startsWith("tb:")) {
@@ -159,6 +160,18 @@
       result._timestamp = new Date().toISOString();
 
       return JSON.stringify(result);
+    }
+
+    function delData() {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+      
+        if (key.startsWith("tb:")) {
+          localStorage.removeItem(key);
+        }
+      }
+
+      document.write(`<h1>Successful data removal at ${dayjs().format("D MMM YYYY [at] H:mm:ss")}</h1><p>Your data has been permanently removed; you can now <a href='darkerguy.github.io/tidebar'>start using Tidebar again</a> or go to any site you like.</p>`); document.close();
     }
 
     function getCodeAndOpenPopup() {

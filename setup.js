@@ -49,9 +49,10 @@ window.updateSettings = () => {
     "okayRain": localStorage.getItem("tb:okayRain") || "false",
     "tempTolerance": localStorage.getItem("tb:tempTolerance") || "3",
     "seaTempTolerance": localStorage.getItem("tb:seaTempTolerance") || "2",
-    "windPref": localStorage.getItem("tb:windPref") || "anyWind",
     "skinSens": localStorage.getItem("tb:skinSens") || "normal",
     "familyMode": localStorage.getItem("tb:familyMode") || "false",
+    "minWind": localStorage.getItem("tb:minWind") || "5",
+    "maxWind": localStorage.getItem("tb:maxWind") || "20",
   }
 }
 
